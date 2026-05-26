@@ -114,8 +114,8 @@ if uploaded_file is not None:
                 f'''
                 <div class="color-fade-logo">
                     <img src="https://www.sman7bks.sch.id/media_library/images/5690a29e44fc8a2b235821eb4cbf765a.png" width="130">
-                    <h3 style="margin-top: 15px;">NutriView Sekolah sedang menghitung gizi...</h3>
-                    <p style="font-style: italic;">Sabar ya, logo sekolahmu sedang 'berubah warna' selagi AI berpikir...</p>
+                    <h3 style="margin-top: 15px;">NutriView sedang menghitung gizi...</h3>
+                    <p style="font-style: italic;">Sabar ya, AI sedang berpikir...</p>
                 </div>
                 ''', 
                 unsafe_allow_html=True
