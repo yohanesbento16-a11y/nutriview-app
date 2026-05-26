@@ -79,8 +79,8 @@ st.markdown(custom_css, unsafe_allow_html=True)
 # 3. FITUR UTAMA: ANALISIS MAKANAN SEKOLAH
 # =====================================================================
 st.title("🏫 NutriView Sekolah")
-st.subheader("Hitung Gizi Jajananmu Lewat Foto")
-st.write("Belajar makan sehat! Unggah foto jajananmu, dan AI akan menganalisis perkiraan kandungan gizinya.")
+st.subheader("Hitung Gizi Makananmu Lewat Foto")
+st.write("Belajar makan sehat! Unggah foto makananmu, dan AI akan menganalisis perkiraan kandungan gizinya.")
 
 uploaded_file = st.file_uploader("Pilih atau Ambil Foto Jajanan/Makanan Sekolah...", type=["jpg", "jpeg", "png"])
 
