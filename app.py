@@ -7,7 +7,7 @@ from PIL import Image
 # Ganti tulisan di dalam tanda petik dengan API Key asli dari Google AI Studio
 # Contoh: GEMINI_API_KEY = "AIzaSy..."
 # =====================================================================
-GEMINI_API_KEY = "AIzaSyDoFjIhxHXC42zKuiTm7K09129AhIYXGTc"
+GEMINI_API_KEY = st.secrets["GEMINI_API_KEY"]
 
 # Menghubungkan aplikasi langsung ke server AI Gemini
 genai.configure(api_key=GEMINI_API_KEY)
