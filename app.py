@@ -161,7 +161,7 @@ st.subheader("💬 Hubungi Kami (Saran & Kritik Sekolah)")
 st.write("Aplikasi ini untuk belajar makan sehat. Kasih masukan ya biar makin bagus!")
 
 with st.form(key="form_saran_kritik", clear_on_submit=True):
-    nama = st.text_input("Nama/Kelas :")
+    nama = st.text_input("Nama:")
     tipe_pesan = st.selectbox("Jenis Masukan Sekolah:", ["Saran Fitur Baru", "Lapor Bug (Mogok)", "Ide Jajanan Sehat", "Lainnya"])
     pesan = st.text_area("Tulis saran atau kritik Anda di sini:")
     submit_button = st.form_submit_button(label="Kirim Masukan 📩")
