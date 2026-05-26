@@ -3,30 +3,74 @@ import google.generativeai as genai
 from PIL import Image
 
 # =====================================================================
-# 1. KONFIGURASI API KEY (Tanam Kunci Kamu di Sini)
-# Ganti tulisan di dalam tanda petik dengan API Key asli dari Google AI Studio
-# Contoh: GEMINI_API_KEY = "AIzaSy..."
+# 1. KONFIGURASI API KEY (Menggunakan Brankas Aman Streamlit Secrets)
 # =====================================================================
-GEMINI_API_KEY = st.secrets["GEMINI_API_KEY"]
+try:
+    GEMINI_API_KEY = st.secrets["GEMINI_API_KEY"]
+    genai.configure(api_key=GEMINI_API_KEY)
+except Exception:
+    st.warning("⚠️ API Key belum dikonfigurasi di Streamlit Secrets.")
 
-# Menghubungkan aplikasi langsung ke server AI Gemini
-genai.configure(api_key=GEMINI_API_KEY)
 
-
-# 2. Konfigurasi Halaman & Tema
+# =====================================================================
+# 2. KONFIGURASI HALAMAN & CUSTOM TEMA (Light & Dark Mode)
+# =====================================================================
 st.set_page_config(page_title="NutriView - Hitung Gizi Foto Makanan", page_icon="🥗", layout="centered")
 
+# Skrip CSS Pintar untuk Mengubah Warna sesuai Light/Dark Mode Pengguna
+custom_css = """
+<style>
+    /* Deteksi Mode Terang (Light Mode) */
+    @media (prefers-color-scheme: light) {
+        h1, h2, h3, .stSubheader, label, p {
+            color: #6495ED !important;
+        }
+        div.stButton > button:first-child {
+            background-color: #6495ED !important;
+            color: white !important;
+            border: none;
+        }
+    }
+    
+    /* Deteksi Mode Gelap (Dark Mode) */
+    @media (prefers-color-scheme: dark) {
+        h1, h2, h3, .stSubheader, label, p {
+            color: #191970 !important;
+        }
+        div.stButton > button:first-child {
+            background-color: #191970 !important;
+            color: white !important;
+            border: none;
+        }
+    }
+    
+    /* Efek hover tombol universal */
+    div.stButton > button:first-child:hover {
+        opacity: 0.85;
+    }
+</style>
+"""
+st.markdown(custom_css, unsafe_allow_html=True)
+
+
+# =====================================================================
+# 3. FITUR UTAMA: ANALISIS MAKANAN
+# =====================================================================
 st.title("🥗 NutriView AI")
 st.subheader("Hitung Gizi Makananmu Lewat Foto")
 st.write("Unggah foto makananmu, dan AI akan menganalisis perkiraan kandungan gizinya.")
 
-
-# 3. Fitur Utama: Analisis Makanan (Langsung terbuka untuk semua orang)
 uploaded_file = st.file_uploader("Pilih atau Ambil Foto Makanan...", type=["jpg", "jpeg", "png"])
 
 if uploaded_file is not None:
     image = Image.open(uploaded_file)
     st.image(image, caption='Makanan yang Diunggah', use_column_width=True)
+    
+    # FITUR REVISI / KOREKSI MENU: Kotak Catatan Tambahan untuk AI
+    catatan_user = st.text_input(
+        label="✍️ Catatan Tambahan / Koreksi Menu (Opsional):",
+        placeholder="Contoh: Yang bulat kuning itu jeruk ya, bukan mangga. Atau: Ini nasi merah dan ayam bakar."
+    )
     
     # Tombol Analisis
     if st.button("Hitung Kandungan Gizi 🚀"):
@@ -34,16 +78,16 @@ if uploaded_file is not None:
             try:
                 model = genai.GenerativeModel('gemini-2.5-flash')
                 
-                prompt = """
+                # Prompt instruksi khusus ahli gizi
+                prompt = f"""
                 Bertindaklah sebagai ahli gizi profesional. Analisis foto makanan berikut dan berikan output dalam Bahasa Indonesia dengan format yang rapi:
                 1. **Nama Makanan**: Identifikasi nama makanan/hidangan di foto.
                 2. **Estimasi Berat**: Perkiraan porsi dalam gram.
-                3. **Tabel Nilai Nutrisi**: Berikan perkiraan jumlah:
-                   - Kalori (kcal)
-                   - Karbohidrat (gram)
-                   - Protein (gram)
-                   - Lemak (gram)
+                3. **Tabel Nilai Nutrisi**: Berikan perkiraan jumlah Kalori (kcal), Karbohidrat (g), Protein (g), dan Lemak (g).
                 4. **Kesimpulan Singkat**: Apakah makanan ini sehat/seimbang? Berikan rekomendasi singkat.
+                
+                PENTING: Jika pengguna memberikan catatan atau koreksi di bawah ini, prioritaskan catatan tersebut dalam analisis dan perhitungan gizimu!
+                Catatan dari pengguna: "{catatan_user}"
                 """
                 
                 response = model.generate_content([prompt, image])
@@ -57,7 +101,10 @@ if uploaded_file is not None:
 # --- PEMBATAS SEKSI ---
 st.markdown("---")
 
-# 4. Fitur Saran dan Kritik
+
+# =====================================================================
+# 4. FITUR SARAN DAN KRITIK
+# =====================================================================
 st.subheader("💬 Hubungi Kami (Saran & Kritik)")
 with st.form(key="form_saran_kritik", clear_on_submit=True):
     nama = st.text_input("Nama (Opsional):")
@@ -72,34 +119,31 @@ with st.form(key="form_saran_kritik", clear_on_submit=True):
         else:
             with open("saran_kritik.txt", "a", encoding="utf-8") as f:
                 f.write(f"Tipe: {tipe_pesan} | Oleh: {nama}\nPesan: {pesan}\n{'-'*30}\n")
-            st.success("Terima kasih! Masukan Anda telah berhasil direkam oleh NutriView.")
-            # =====================================================================
-# 5. MENU ADMIN RAHASIA (Hanya untuk pemilik aplikasi)
-# =====================================================================
+            st.success("Terma kasih! Masukan Anda telah berhasil direkam oleh NutriView.")
+
+# --- PEMBATAS SEKSI ---
 st.markdown("---")
+
+
+# =====================================================================
+# 5. MENU ADMIN RAHASIA (Pintu Belakang untuk Ambil Hasil Survei)
+# =====================================================================
 with st.expander("🔐 Menu Admin (Khusus Pengembang)"):
     input_password = st.text_input("Masukkan Password Admin:", type="password")
     
-    # Kamu bisa mengganti "survei123" dengan password buatanmu sendiri
     if input_password == "survei123": 
         st.success("Akses Diterima!")
-        
         try:
-            # Membaca file saran yang tersimpan di server
             with open("saran_kritik.txt", "r", encoding="utf-8") as f:
                 data_saran = f.read()
             
-            # Tombol sakti untuk download file ke laptop/HP kamu
             st.download_button(
                 label="📥 Unduh File Saran & Kritik (.txt)",
                 data=data_saran,
                 file_name="hasil_survei_nutriview.txt",
                 mime="text/plain"
-                )
-            
-            # Menampilkan isi pesannya langsung di layar admin
+            )
             st.markdown("### 📝 Isi Pesan Saat Ini:")
             st.text_area("", value=data_saran, height=250)
-            
         except FileNotFoundError:
             st.info("Belum ada saran atau kritik yang masuk dari responden.")
