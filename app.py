@@ -73,3 +73,33 @@ with st.form(key="form_saran_kritik", clear_on_submit=True):
             with open("saran_kritik.txt", "a", encoding="utf-8") as f:
                 f.write(f"Tipe: {tipe_pesan} | Oleh: {nama}\nPesan: {pesan}\n{'-'*30}\n")
             st.success("Terima kasih! Masukan Anda telah berhasil direkam oleh NutriView.")
+            # =====================================================================
+# 5. MENU ADMIN RAHASIA (Hanya untuk pemilik aplikasi)
+# =====================================================================
+st.markdown("---")
+with st.expander("🔐 Menu Admin (Khusus Pengembang)"):
+    input_password = st.text_input("Masukkan Password Admin:", type="password")
+    
+    # Kamu bisa mengganti "survei123" dengan password buatanmu sendiri
+    if input_password == "survei123": 
+        st.success("Akses Diterima!")
+        
+        try:
+            # Membaca file saran yang tersimpan di server
+            with open("saran_kritik.txt", "r", encoding="utf-8") as f:
+                data_saran = f.read()
+            
+            # Tombol sakti untuk download file ke laptop/HP kamu
+            st.download_button(
+                label="📥 Unduh File Saran & Kritik (.txt)",
+                data=data_saran,
+                file_name="hasil_survei_nutriview.txt",
+                mime="text/plain"
+                )
+            
+            # Menampilkan isi pesannya langsung di layar admin
+            st.markdown("### 📝 Isi Pesan Saat Ini:")
+            st.text_area("", value=data_saran, height=250)
+            
+        except FileNotFoundError:
+            st.info("Belum ada saran atau kritik yang masuk dari responden.")
