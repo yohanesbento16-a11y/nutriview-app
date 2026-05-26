@@ -78,7 +78,7 @@ st.markdown(custom_css, unsafe_allow_html=True)
 # =====================================================================
 # 3. FITUR UTAMA: ANALISIS MAKANAN SEKOLAH
 # =====================================================================
-st.title("🏫 NutriView Sekolah")
+st.title("🏫 NutriView")
 st.subheader("Hitung Gizi Makananmu Lewat Foto")
 st.write("Belajar makan sehat! Unggah foto makananmu, dan AI akan menganalisis perkiraan kandungan gizinya.")
 
@@ -143,7 +143,7 @@ if uploaded_file is not None:
             loading_area.empty()
             
             st.success("Analisis Selesai! Selamat belajar tentang makananmu! 📚")
-            st.markdown("### 📊 Hasil Perhitungan Gizi Jajanan Sekolahmu:")
+            st.markdown("### 📊 Hasil Perhitungan Gizi Makananmu:")
             st.write(response.text)
             
         except Exception as e:
