@@ -1,6 +1,7 @@
 import streamlit as st
 import google.generativeai as genai
 from PIL import Image
+import time
 
 # =====================================================================
 # 1. KONFIGURASI API KEY (Menggunakan Brankas Aman Streamlit Secrets)
@@ -17,7 +18,7 @@ except Exception:
 # =====================================================================
 st.set_page_config(page_title="NutriView - Hitung Gizi Foto Makanan", page_icon="🥗", layout="centered")
 
-# Skrip CSS: Hanya mengubah Light Mode ke Cornflower Blue. Dark Mode dibiarkan otomatis putih bawaan sistem.
+# Skrip CSS untuk mengatur tampilan warna
 custom_css = """
 <style>
     /* Hanya mengatur Mode Terang (Light Mode) */
@@ -32,18 +33,32 @@ custom_css = """
         }
     }
     
-    /* Mode Gelap (Dark Mode) dibiarkan MENYESUAIKAN otomatis agar teks berwarna putih/terang */
+    /* Mode Gelap (Dark Mode) otomatis putih bawaan sistem */
     @media (prefers-color-scheme: dark) {
         div.stButton > button:first-child {
-            background-color: #6495ED !important; /* Tombol tetap biru cerah agar kontras */
+            background-color: #6495ED !important;
             color: white !important;
             border: none;
         }
     }
     
-    /* Efek hover tombol universal */
+    /* Efek hover tombol */
     div.stButton > button:first-child:hover {
         opacity: 0.85;
+    }
+    
+    /* Efek Animasi Berkedip/Denyut untuk Logo Saat Loading */
+    @keyframes pulse {
+        0% { opacity: 0.4; transform: scale(0.98); }
+        50% { opacity: 1; transform: scale(1.02); }
+        100% { opacity: 0.4; transform: scale(0.98); }
+    }
+    .loading-logo {
+        animation: pulse 1.5s infinite ease-in-out;
+        display: block;
+        margin-left: auto;
+        margin-right: auto;
+        text-align: center;
     }
 </style>
 """
@@ -71,29 +86,53 @@ if uploaded_file is not None:
     
     # Tombol Analisis
     if st.button("Hitung Kandungan Gizi 🚀"):
-        with st.spinner("AI sedang menganalisis makananmu... Mohon tunggu..."):
-            try:
-                model = genai.GenerativeModel('gemini-2.5-flash')
-                
-                # Prompt instruksi khusus ahli gizi
-                prompt = f"""
-                Bertindaklah sebagai ahli gizi profesional. Analisis foto makanan berikut dan berikan output dalam Bahasa Indonesia dengan format yang rapi:
-                1. **Nama Makanan**: Identifikasi nama makanan/hidangan di foto.
-                2. **Estimasi Berat**: Perkiraan porsi dalam gram.
-                3. **Tabel Nilai Nutrisi**: Berikan perkiraan jumlah Kalori (kcal), Karbohidrat (g), Protein (g), dan Lemak (g).
-                4. **Kesimpulan Singkat**: Apakah makanan ini sehat/seimbang? Berikan rekomendasi singkat.
-                
-                PENTING: Jika pengguna memberikan catatan atau koreksi di bawah ini, prioritaskan catatan tersebut dalam analisis dan perhitungan gizimu!
-                Catatan dari pengguna: "{catatan_user}"
-                """
-                
-                response = model.generate_content([prompt, image])
-                st.success("Analisis Selesai!")
-                st.markdown("### 📊 Hasil Perhitungan Gizi:")
-                st.write(response.text)
-                
-            except Exception as e:
-                st.error(f"Terjadi kesalahan: {e}")
+        
+        # 🌟 INDIKATOR LOADING KUSTOM MENGGUNAKAN LOGO 🌟
+        # Membuat area kosong sementara untuk memunculkan logo saat loading berjalan
+        l<img src="https://cdn.flipsnack.com/users/C6C8FBF6AED/images/profile?v=0" width="120">
+        
+        with loading_area.container():
+            st.markdown("<br>", unsafe_allow_html=True)
+            # Trik memunculkan Logo dengan animasi berkedip (pulse) lewat HTML kustom
+            # Catatan: Ganti URL gambar di bawah ini dengan link logo aslimu jika ada, saat ini menggunakan logo bawaan salad
+            st.markdown(
+                '''
+                <div class="loading-logo">
+                    <span style="font-size: 70px;">🥗</span>
+                    <h3 style="margin-top: 10px;">NutriView AI sedang menghitung gizi...</h3>
+                    <p style="font-style: italic;">Mohon tunggu sebentar ya...</p>
+                </div>
+                ''', 
+                unsafe_allow_html=True
+            )
+        
+        # Jalankan proses analisis AI di latar belakang
+        try:
+            model = genai.GenerativeModel('gemini-2.5-flash')
+            
+            prompt = f"""
+            Bertindaklah sebagai ahli gizi profesional. Analisis foto makanan berikut dan berikan output dalam Bahasa Indonesia dengan format yang rapi:
+            1. **Nama Makanan**: Identifikasi nama makanan/hidangan di foto.
+            2. **Estimasi Berat**: Perkiraan porsi dalam gram.
+            3. **Tabel Nilai Nutrisi**: Berikan perkiraan jumlah Kalori (kcal), Karbohidrat (g), Protein (g), dan Lemak (g).
+            4. **Kesimpulan Singkat**: Apakah makanan ini sehat/seimbang? Berikan rekomendasi singkat.
+            
+            PENTING: Jika pengguna memberikan catatan atau koreksi di bawah ini, prioritaskan catatan tersebut dalam analisis dan perhitungan gizimu!
+            Catatan dari pengguna: "{catatan_user}"
+            """
+            
+            response = model.generate_content([prompt, image])
+            
+            # Setelah AI selesai berpikir, hapus tampilan loading logo agar bersih kembali
+            loading_area.empty()
+            
+            st.success("Analisis Selesai!")
+            st.markdown("### 📊 Hasil Perhitungan Gizi:")
+            st.write(response.text)
+            
+        except Exception as e:
+            loading_area.empty() # Hapus loading jika terjadi error
+            st.error(f"Terjadi kesalahan: {e}")
 
 # --- PEMBATAS SEKSI ---
 st.markdown("---")
