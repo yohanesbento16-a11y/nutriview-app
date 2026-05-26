@@ -1,7 +1,6 @@
 import streamlit as st
 import google.generativeai as genai
 from PIL import Image
-import time
 
 # =====================================================================
 # 1. KONFIGURASI API KEY (Menggunakan Brankas Aman Streamlit Secrets)
@@ -18,7 +17,7 @@ except Exception:
 # =====================================================================
 st.set_page_config(page_title="NutriView - Hitung Gizi Foto Makanan", page_icon="🥗", layout="centered")
 
-# Skrip CSS untuk mengatur tampilan warna
+# Skrip CSS untuk mengatur tampilan warna & animasi logo sekolah saat loading
 custom_css = """
 <style>
     /* Hanya mengatur Mode Terang (Light Mode) */
@@ -47,7 +46,7 @@ custom_css = """
         opacity: 0.85;
     }
     
-    /* Efek Animasi Berkedip/Denyut untuk Logo Saat Loading */
+    /* Efek Animasi Berkedip/Denyut untuk Logo Sekolah Saat Loading */
     @keyframes pulse {
         0% { opacity: 0.4; transform: scale(0.98); }
         50% { opacity: 1; transform: scale(1.02); }
@@ -87,26 +86,24 @@ if uploaded_file is not None:
     # Tombol Analisis
     if st.button("Hitung Kandungan Gizi 🚀"):
         
-        # 🌟 INDIKATOR LOADING KUSTOM MENGGUNAKAN LOGO 🌟
-        # Membuat area kosong sementara untuk memunculkan logo saat loading berjalan
-        l<img src="https://cdn.flipsnack.com/users/C6C8FBF6AED/images/profile?v=0" width="120">
+        # INDIKATOR LOADING KUSTOM MENGGUNAKAN LOGO SEKOLAH
+        loading_area = st.empty()
         
         with loading_area.container():
             st.markdown("<br>", unsafe_allow_html=True)
-            # Trik memunculkan Logo dengan animasi berkedip (pulse) lewat HTML kustom
-            # Catatan: Ganti URL gambar di bawah ini dengan link logo aslimu jika ada, saat ini menggunakan logo bawaan salad
+            # Menampilkan logo sekolahmu dengan animasi loading berdenyut
             st.markdown(
                 '''
                 <div class="loading-logo">
-                    <span style="font-size: 70px;">🥗</span>
-                    <h3 style="margin-top: 10px;">NutriView AI sedang menghitung gizi...</h3>
+                    <img src="https://cdn.flipsnack.com/users/C6C8FBF6AED/images/profile?v=0" width="130" style="border-radius: 10px;">
+                    <h3 style="margin-top: 15px;">NutriView AI sedang menghitung gizi...</h3>
                     <p style="font-style: italic;">Mohon tunggu sebentar ya...</p>
                 </div>
                 ''', 
                 unsafe_allow_html=True
             )
         
-        # Jalankan proses analisis AI di latar belakang
+        # Jalankan proses analisis AI
         try:
             model = genai.GenerativeModel('gemini-2.5-flash')
             
@@ -123,7 +120,7 @@ if uploaded_file is not None:
             
             response = model.generate_content([prompt, image])
             
-            # Setelah AI selesai berpikir, hapus tampilan loading logo agar bersih kembali
+            # Hapus logo loading setelah selesai
             loading_area.empty()
             
             st.success("Analisis Selesai!")
@@ -131,7 +128,7 @@ if uploaded_file is not None:
             st.write(response.text)
             
         except Exception as e:
-            loading_area.empty() # Hapus loading jika terjadi error
+            loading_area.empty()
             st.error(f"Terjadi kesalahan: {e}")
 
 # --- PEMBATAS SEKSI ---
@@ -170,7 +167,7 @@ with st.expander("🔐 Menu Admin (Khusus Pengembang)"):
     if input_password == "survei123": 
         st.success("Akses Diterima!")
         try:
-            with open("saran_kritik.txt", "r", encoding="utf-8") as f:
+            with open("saran_kick.txt", "r", encoding="utf-8") as f:
                 data_saran = f.read()
             
             st.download_button(
