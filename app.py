@@ -17,12 +17,12 @@ except Exception:
 # =====================================================================
 st.set_page_config(page_title="NutriView - Hitung Gizi Foto Makanan", page_icon="🥗", layout="centered")
 
-# Skrip CSS Pintar untuk Mengubah Warna sesuai Light/Dark Mode Pengguna
+# Skrip CSS Pintar untuk Mengubah Aksen Judul & Tombol (Teks Biasa Ikut Sistem)
 custom_css = """
 <style>
     /* Deteksi Mode Terang (Light Mode) */
     @media (prefers-color-scheme: light) {
-        h1, h2, h3, .stSubheader, label, p {
+        h1, h2, h3, .stSubheader {
             color: #6495ED !important;
         }
         div.stButton > button:first-child {
@@ -34,7 +34,7 @@ custom_css = """
     
     /* Deteksi Mode Gelap (Dark Mode) */
     @media (prefers-color-scheme: dark) {
-        h1, h2, h3, .stSubheader, label, p {
+        h1, h2, h3, .stSubheader {
             color: #191970 !important;
         }
         div.stButton > button:first-child {
@@ -119,7 +119,7 @@ with st.form(key="form_saran_kritik", clear_on_submit=True):
         else:
             with open("saran_kritik.txt", "a", encoding="utf-8") as f:
                 f.write(f"Tipe: {tipe_pesan} | Oleh: {nama}\nPesan: {pesan}\n{'-'*30}\n")
-            st.success("Terma kasih! Masukan Anda telah berhasil direkam oleh NutriView.")
+            st.success("Terima kasih! Masukan Anda telah berhasil direkam oleh NutriView.")
 
 # --- PEMBATAS SEKSI ---
 st.markdown("---")
@@ -134,7 +134,7 @@ with st.expander("🔐 Menu Admin (Khusus Pengembang)"):
     if input_password == "survei123": 
         st.success("Akses Diterima!")
         try:
-            with open("saran_kritik.txt", "r", encoding="utf-8") as f:
+            with open("saran_kick.txt", "r", encoding="utf-8") as f:
                 data_saran = f.read()
             
             st.download_button(
