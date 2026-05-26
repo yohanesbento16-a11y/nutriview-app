@@ -13,14 +13,14 @@ except Exception:
 
 
 # =====================================================================
-# 2. KONFIGURASI HALAMAN & CUSTOM TEMA (Light & Dark Mode)
+# 2. KONFIGURASI HALAMAN & CUSTOM TEMA (Menyesuaikan Otomatis)
 # =====================================================================
 st.set_page_config(page_title="NutriView - Hitung Gizi Foto Makanan", page_icon="🥗", layout="centered")
 
-# Skrip CSS Pintar untuk Mengubah Aksen Judul & Tombol (Teks Biasa Ikut Sistem)
+# Skrip CSS: Hanya mengubah Light Mode ke Cornflower Blue. Dark Mode dibiarkan otomatis putih bawaan sistem.
 custom_css = """
 <style>
-    /* Deteksi Mode Terang (Light Mode) */
+    /* Hanya mengatur Mode Terang (Light Mode) */
     @media (prefers-color-scheme: light) {
         h1, h2, h3, .stSubheader {
             color: #6495ED !important;
@@ -32,13 +32,10 @@ custom_css = """
         }
     }
     
-    /* Deteksi Mode Gelap (Dark Mode) */
+    /* Mode Gelap (Dark Mode) dibiarkan MENYESUAIKAN otomatis agar teks berwarna putih/terang */
     @media (prefers-color-scheme: dark) {
-        h1, h2, h3, .stSubheader {
-            color: #191970 !important;
-        }
         div.stButton > button:first-child {
-            background-color: #191970 !important;
+            background-color: #6495ED !important; /* Tombol tetap biru cerah agar kontras */
             color: white !important;
             border: none;
         }
@@ -134,7 +131,7 @@ with st.expander("🔐 Menu Admin (Khusus Pengembang)"):
     if input_password == "survei123": 
         st.success("Akses Diterima!")
         try:
-            with open("saran_kick.txt", "r", encoding="utf-8") as f:
+            with open("saran_kritik.txt", "r", encoding="utf-8") as f:
                 data_saran = f.read()
             
             st.download_button(
