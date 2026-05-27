@@ -29,11 +29,6 @@ custom_css = """
     .stAppDeployButton {
         display: none !important;
     }
-    
-    /* 4. Hapus elemen Toolbar tambahan Streamlit (jika ada) */
-    [data-testid="stToolbar"] {
-        display: none !important;
-    }
 
     /* Tema Warna Judul & Tombol (Aman) */
     @media (prefers-color-scheme: light) {
@@ -47,14 +42,6 @@ custom_css = """
     
     /* Percantik tampilan kartu menu kantin */
     .menu-card {
-        border: 1px solid #ddd;
-        border-radius: 10px;
-        padding: 15px;
-        margin-bottom: 20px;
-    }
-</style>
-"""
-st.markdown(custom_css, unsafe_allow_html=True)
         border: 1px solid #ddd;
         border-radius: 10px;
         padding: 15px;
@@ -111,7 +98,7 @@ with tab_siswa:
                 
                 with col1:
                     # Menampilkan foto (dari format Base64)
-                    if menu["foto_base64"]:
+                    if menu.get("foto_base64"):
                         gambar_bytes = base64.b64decode(menu["foto_base64"])
                         st.image(gambar_bytes, use_column_width=True)
                     else:
@@ -183,44 +170,3 @@ with tab_admin:
                         }
                         
                         data_menu.append(menu_baru)
-                        simpan_data_menu(data_menu)
-                        st.success(f"Berhasil menambahkan {nama_makanan} ke Menu Hari Ini!")
-                        st.rerun() # Refresh aplikasi agar menu langsung muncul
-        
-        # Fitur 2: Hapus Menu
-        with st.expander("🗑️ Hapus Menu"):
-            if len(data_menu) > 0:
-                pilihan_hapus = st.selectbox("Pilih menu yang ingin dihapus:", [m["nama"] for m in data_menu])
-                if st.button("Hapus Menu Terpilih"):
-                    data_menu = [m for m in data_menu if m["nama"] != pilihan_hapus]
-                    simpan_data_menu(data_menu)
-                    st.success(f"Menu '{pilihan_hapus}' berhasil dihapus.")
-                    st.rerun()
-            else:
-                st.info("Belum ada data menu.")
-                
-        # Fitur 3: Lihat Saran & Kritik Siswa
-        with st.expander("📬 Kotak Masukan Siswa"):
-            try:
-                with open("saran_kritik.txt", "r", encoding="utf-8") as f:
-                    data_saran = f.read()
-                st.text_area("Isi Kotak Saran Saat Ini:", value=data_saran, height=200)
-                st.download_button("📥 Unduh File Saran (.txt)", data=data_saran, file_name="saran_sekolah.txt")
-            except FileNotFoundError:
-                st.info("Belum ada saran atau kritik yang masuk.")
-
-# =====================================================================
-# 4. KOTAK SARAN (UNTUK SISWA) - Tampil di bagian paling bawah
-# =====================================================================
-st.markdown("---")
-st.subheader("💬 Hubungi Admin Kantin")
-with st.form("form_saran", clear_on_submit=True):
-    nama_siswa = st.text_input("Nama/Kelas (Opsional):")
-    pesan_siswa = st.text_area("Tulis saran, request jajanan sehat, atau kritik di sini:")
-    if st.form_submit_button("Kirim Masukan 📩"):
-        if pesan_siswa.strip():
-            with open("saran_kritik.txt", "a", encoding="utf-8") as f:
-                f.write(f"Dari: {nama_siswa}\nPesan: {pesan_siswa}\n{'-'*30}\n")
-            st.success("Terima kasih! Masukanmu sudah terkirim.")
-        else:
-            st.error("Pesan tidak boleh kosong.")
