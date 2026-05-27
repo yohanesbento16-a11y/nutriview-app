@@ -111,7 +111,8 @@ with tab_siswa:
 with tab_admin:
     input_password = st.text_input("Masukkan Password Admin Sekolah:", type="password")
     
-    if input_password == "00000":
+    # Python akan mengambil password asli dari brankas Secrets Streamlit
+    if input_password == st.secrets["PASSWORD_ADMIN"]:
         st.success("Akses Diterima! Selamat datang, Admin.")
         
         # Fitur Tambah Menu
