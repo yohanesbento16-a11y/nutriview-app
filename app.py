@@ -64,11 +64,11 @@ data_menu = muat_data_menu()
 # =====================================================================
 # 3. TAMPILAN ANTARMUKA UTAMA
 # =====================================================================
-st.title("🏫 NutriView Sekolah")
-st.write("Informasi gizi jajanan sehat kantin sekolah kita hari ini!")
+st.title("🏫 NutriView")
+st.write("Informasi gizi makanan kita hari ini!")
 
 # Menu Tab Navigasi
-tab_siswa, tab_admin = st.tabs(["🍽️ Menu Hari Ini", "🔐 Panel Admin Kantin"])
+tab_siswa, tab_admin = st.tabs(["🍽️ Menu Hari Ini", "🔐 Panel Admin"])
 
 # ---------------------------------------------------------------------
 # TAB 1: HALAMAN SISWA
@@ -111,7 +111,7 @@ with tab_siswa:
 with tab_admin:
     input_password = st.text_input("Masukkan Password Admin Sekolah:", type="password")
     
-    if input_password == "survei123":
+    if input_password == "00000":
         st.success("Akses Diterima! Selamat datang, Admin.")
         
         # Fitur Tambah Menu
@@ -181,10 +181,10 @@ with tab_admin:
 # 4. KOTAK SARAN SISWA (TAMPIL DI BAGIAN PALING BAWAH HALAMAN)
 # =====================================================================
 st.markdown("---")
-st.subheader("💬 Hubungi Admin Kantin (Saran & Kritik)")
+st.subheader("💬 Hubungi Admin (Saran & Kritik)")
 with st.form("form_saran", clear_on_submit=True):
-    nama_siswa = st.text_input("Nama/Kelas (Opsional):")
-    pesan_siswa = st.text_area("Tulis saran, request jajanan sehat, atau kritik di sini:")
+    nama_siswa = st.text_input("Nama:")
+    pesan_siswa = st.text_area("Tulis saran, request makanan sehat, atau kritik di sini:")
     if st.form_submit_button("Kirim Masukan 📩"):
         if pesan_siswa.strip():
             with open("saran_kritik.txt", "a", encoding="utf-8") as f:
