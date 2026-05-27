@@ -106,7 +106,7 @@ with tab_siswa:
 
 
 # ---------------------------------------------------------------------
-# TAB 2: HALAMAN PANEL ADMIN KANTIN
+# TAB 2: HALAMAN PANEL ADMIN
 # ---------------------------------------------------------------------
 with tab_admin:
     input_password = st.text_input("Masukkan Password Admin Sekolah:", type="password")
