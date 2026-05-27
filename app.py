@@ -55,9 +55,6 @@ custom_css = """
 </style>
 """
 st.markdown(custom_css, unsafe_allow_html=True)
-    
-    /* Percantik tampilan kartu menu kantin */
-    .menu-card {
         border: 1px solid #ddd;
         border-radius: 10px;
         padding: 15px;
