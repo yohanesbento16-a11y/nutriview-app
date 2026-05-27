@@ -10,12 +10,19 @@ st.set_page_config(page_title="NutriView - Kantin Sehat Sekolah", page_icon="�
 
 custom_css = """
 <style>
-    /* Sembunyikan ikon GitHub di header agar aman */
-    [data-testid="stHeader"] a[href*="github.com"] {
+    /* 🌟 KODE AJAIB: MENGHILANGKAN GITHUB & FORK, TAPI MEMPERTAHANKAN MENU TEMA 🌟 */
+    
+    /* Menyembunyikan semua tautan (seperti ikon GitHub & Fork) di bagian atas */
+    [data-testid="stHeader"] a {
+        display: none !important;
+    }
+    
+    /* Menyembunyikan tombol Deploy/Manage App bawaan Streamlit Cloud (jika muncul) */
+    .stAppDeployButton {
         display: none !important;
     }
 
-    /* Tema Warna Judul & Tombol */
+    /* Tema Warna Judul & Tombol (Mengikuti Dark Mode / Light Mode Sistem) */
     @media (prefers-color-scheme: light) {
         h1, h2, h3, .stSubheader { color: #6495ED !important; }
         div.stButton > button:first-child { background-color: #6495ED !important; color: white !important; border: none; }
@@ -25,7 +32,7 @@ custom_css = """
     }
     div.stButton > button:first-child:hover { opacity: 0.85; }
     
-    /* Percantik tampilan kartu menu */
+    /* Percantik tampilan kartu menu kantin */
     .menu-card {
         border: 1px solid #ddd;
         border-radius: 10px;
@@ -37,7 +44,7 @@ custom_css = """
 st.markdown(custom_css, unsafe_allow_html=True)
 
 # =====================================================================
-# 2. SISTEM DATABASE LOKAL (Penyimpanan JSON)
+# 2. SISTEM DATABASE LOKAL (Penyimpanan JSON Manual)
 # =====================================================================
 DB_FILE = "menu_sekolah.json"
 
@@ -60,11 +67,11 @@ data_menu = muat_data_menu()
 # =====================================================================
 # 3. TAMPILAN ANTARMUKA (MENGGUNAKAN TAB)
 # =====================================================================
-st.title("🏫 NutriView")
-st.write("Informasi gizi makanan kita hari ini!")
+st.title("🏫 NutriView Sekolah")
+st.write("Informasi gizi jajanan sehat kantin sekolah kita hari ini!")
 
 # Membuat 2 Halaman (Tab)
-tab_siswa, tab_admin = st.tabs(["🍽️ Menu Hari Ini", "🔐 Panel Admin"])
+tab_siswa, tab_admin = st.tabs(["🍽️ Menu Hari Ini", "🔐 Panel Admin Kantin"])
 
 # ---------------------------------------------------------------------
 # TAB 1: HALAMAN SISWA (Melihat Menu)
@@ -108,9 +115,9 @@ with tab_siswa:
 # TAB 2: HALAMAN ADMIN (Tambah Data & Feedback)
 # ---------------------------------------------------------------------
 with tab_admin:
-    input_password = st.text_input("Masukkan Password Admin:", type="password")
+    input_password = st.text_input("Masukkan Password Admin Sekolah:", type="password")
     
-    if input_password == "00000":
+    if input_password == "survei123":
         st.success("Akses Diterima! Selamat datang, Admin.")
         
         # Fitur 1: Tambah Menu Baru
@@ -185,10 +192,10 @@ with tab_admin:
 # 4. KOTAK SARAN (UNTUK SISWA) - Tampil di bagian paling bawah
 # =====================================================================
 st.markdown("---")
-st.subheader("💬 Kotak Masukan Kritik & Saran")
+st.subheader("💬 Hubungi Admin Kantin")
 with st.form("form_saran", clear_on_submit=True):
     nama_siswa = st.text_input("Nama/Kelas (Opsional):")
-    pesan_siswa = st.text_area("Tulis saran, request makanan sehat, atau kritik di sini:")
+    pesan_siswa = st.text_area("Tulis saran, request jajanan sehat, atau kritik di sini:")
     if st.form_submit_button("Kirim Masukan 📩"):
         if pesan_siswa.strip():
             with open("saran_kritik.txt", "a", encoding="utf-8") as f:
