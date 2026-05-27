@@ -10,19 +10,32 @@ st.set_page_config(page_title="NutriView - Kantin Sehat Sekolah", page_icon="�
 
 custom_css = """
 <style>
-    /* 🌟 KODE AJAIB: MENGHILANGKAN GITHUB & FORK, TAPI MEMPERTAHANKAN MENU TEMA 🌟 */
+    /* 🌟 KODE AJAIB SUPER AGRESIF: HILANGKAN GITHUB, FORK, & DEPLOY 🌟 */
     
-    /* Menyembunyikan semua tautan (seperti ikon GitHub & Fork) di bagian atas */
-    [data-testid="stHeader"] a {
+    /* 1. Hapus semua tombol link (GitHub/Fork) di pojok kanan atas */
+    [data-testid="stHeaderActionElements"] a {
         display: none !important;
     }
     
-    /* Menyembunyikan tombol Deploy/Manage App bawaan Streamlit Cloud (jika muncul) */
+    /* 2. Hapus spesifik tombol yang mengarah ke GitHub */
+    a[href*="github.com"] {
+        display: none !important;
+    }
+    a[title="View source on GitHub"] {
+        display: none !important;
+    }
+    
+    /* 3. Hapus tombol 'Deploy' bawaan Streamlit Cloud */
     .stAppDeployButton {
         display: none !important;
     }
+    
+    /* 4. Hapus elemen Toolbar tambahan Streamlit (jika ada) */
+    [data-testid="stToolbar"] {
+        display: none !important;
+    }
 
-    /* Tema Warna Judul & Tombol (Mengikuti Dark Mode / Light Mode Sistem) */
+    /* Tema Warna Judul & Tombol (Aman) */
     @media (prefers-color-scheme: light) {
         h1, h2, h3, .stSubheader { color: #6495ED !important; }
         div.stButton > button:first-child { background-color: #6495ED !important; color: white !important; border: none; }
@@ -31,6 +44,17 @@ custom_css = """
         div.stButton > button:first-child { background-color: #6495ED !important; color: white !important; border: none; }
     }
     div.stButton > button:first-child:hover { opacity: 0.85; }
+    
+    /* Percantik tampilan kartu menu kantin */
+    .menu-card {
+        border: 1px solid #ddd;
+        border-radius: 10px;
+        padding: 15px;
+        margin-bottom: 20px;
+    }
+</style>
+"""
+st.markdown(custom_css, unsafe_allow_html=True)
     
     /* Percantik tampilan kartu menu kantin */
     .menu-card {
