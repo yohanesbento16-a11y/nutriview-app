@@ -6,7 +6,7 @@ import base64
 # =====================================================================
 # 1. KONFIGURASI HALAMAN & CSS JITU
 # =====================================================================
-st.set_page_config(page_title="NutriView - Kantin Sehat Sekolah", page_icon="🏫", layout="centered")
+st.set_page_config(page_title="NutriView - Sekolah", page_icon="🏫", layout="centered")
 
 custom_css = """
 <style>
