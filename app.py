@@ -27,17 +27,18 @@ custom_css = """
         font-size: 18px !important;
     }
     
-    /* Tombol Streamlit berwarna Pink */
-    div.stButton > button:first-child { 
+    /* Desain Tombol Standar */
+    div.stButton > button { 
         background-color: #ff4b4b !important; 
         color: white !important; 
         border-radius: 20px !important;
-        font-size: 18px !important;
+        font-size: 16px !important;
         font-weight: bold !important;
         border: none !important;
         width: 100%;
+        margin-bottom: 10px;
     }
-    div.stButton > button:first-child:hover {
+    div.stButton > button:hover {
         background-color: #ff7aa2 !important;
     }
 </style>
@@ -45,22 +46,31 @@ custom_css = """
 st.markdown(custom_css, unsafe_allow_html=True)
 
 # =====================================================================
-# PENGATURAN STATE HALAMAN (Untuk pindah-pindah menu)
+# PENGATURAN STATE HALAMAN (Untuk pindah-pindah menu & simpan pilihan)
 # =====================================================================
 if 'halaman' not in st.session_state:
     st.session_state.halaman = 1
+
+# Database sementara untuk menyimpan status tombol kegiatan
+if 'kegiatan_dipilih' not in st.session_state:
+    st.session_state.kegiatan_dipilih = {
+        "makan bareng 🍽️": False,
+        "nonton 🎬": False,
+        "jalan aja 🚶‍♂️": False,
+        "main ajaa 🎡": False,
+        "photoboot 📸": False
+    }
 
 # =====================================================================
 # HALAMAN 1: LOADING & AMPLOP CINTA
 # =====================================================================
 if st.session_state.halaman == 1:
-    # Mengecek apakah loading awal sudah selesai
     if 'loading_selesai' not in st.session_state:
         teks_loading = st.empty()
         bar_loading = st.progress(0)
         
         for persen in range(100):
-            time.sleep(0.03) # Kecepatan loading
+            time.sleep(0.03)
             bar_loading.progress(persen + 1)
             teks_loading.markdown(f"<h3 style='color:#ffb6c1;'>Menyiapkan kejutan untuk Abey... {persen+1}%</h3>", unsafe_allow_html=True)
             
@@ -84,14 +94,11 @@ elif st.session_state.halaman == 2:
     st.markdown("<h1 style='font-size: 60px;'>🧸✨</h1>", unsafe_allow_html=True)
     
     col1, col2 = st.columns(2)
-    
-    # Tombol "Mau"
     with col1:
         if st.button("mauuu!! 💖"):
             st.session_state.halaman = 3
             st.rerun()
             
-    # Tombol "Ga ah" yang kabur (Pakai HTML/JS)
     with col2:
         components.html("""
             <div style="width: 100%; height: 200px; position: relative;">
@@ -110,7 +117,6 @@ elif st.session_state.halaman == 2:
                 function kabur() {
                     var btn = document.getElementById('btnKabur');
                     var container = btn.parentElement;
-                    // Hitung batas maksimal x dan y supaya tombol tidak keluar kotak
                     var maxX = container.clientWidth - btn.clientWidth;
                     var maxY = container.clientHeight - btn.clientHeight;
                     
@@ -129,7 +135,7 @@ elif st.session_state.halaman == 2:
 elif st.session_state.halaman == 3:
     st.markdown("<h2 style='margin-top: 100px;'>yeyy abey mauuu 🥰🎉</h2>", unsafe_allow_html=True)
     with st.spinner(""):
-        time.sleep(2.5) # Jeda waktu sebelum pindah halaman
+        time.sleep(2.5) 
     st.balloons()
     st.session_state.halaman = 4
     st.rerun()
@@ -150,21 +156,40 @@ elif st.session_state.halaman == 4:
         st.rerun()
 
 # =====================================================================
-# HALAMAN 5: NANTI KITA NGAPAIN AJA?
+# HALAMAN 5: NANTI KITA NGAPAIN AJA? (Sekarang Pakai Tombol Ikon)
 # =====================================================================
 elif st.session_state.halaman == 5:
     st.markdown("<h2>nanti kita ngapain aja? 🤔</h2>", unsafe_allow_html=True)
     st.markdown("---")
+    st.write("Klik ikon di bawah untuk memilih (Boleh pilih lebih dari satu ya!):")
+    st.markdown("<br>", unsafe_allow_html=True)
     
-    pilihan_kegiatan = ["makan bareng 🍽️", "nonton 🎬", "jalan aja 🚶‍♂️", "main ajaa 🎡", "photoboot 📸"]
-    # Pakai multiselect supaya bisa pilih lebih dari 1
-    st.session_state.kegiatan = st.multiselect("Pilih yang seru (boleh lebih dari satu!):", pilihan_kegiatan)
+    # Membuat grid baris dan kolom untuk tombol ikon
+    col1, col2, col3 = st.columns(3)
+    col4, col5, col6 = st.columns(3)
     
-    # Kotak untuk ide sendiri
+    kolom_list = [col1, col2, col3, col4, col5]
+    kegiatan_keys = list(st.session_state.kegiatan_dipilih.keys())
+    
+    # Menampilkan tombol layaknya saklar (Toggle)
+    for i, kegiatan in enumerate(kegiatan_keys):
+        is_selected = st.session_state.kegiatan_dipilih[kegiatan]
+        # Jika dipilih, tambahkan centang dan ubah labelnya
+        label = f"✅ {kegiatan}" if is_selected else kegiatan
+        
+        with kolom_list[i]:
+            if st.button(label, key=f"btn_{i}"):
+                # Balikkan status (Jika False jadi True, jika True jadi False)
+                st.session_state.kegiatan_dipilih[kegiatan] = not is_selected
+                st.rerun()
+    
+    st.markdown("<hr style='border-top: 1px dashed #ddd;'>", unsafe_allow_html=True)
     st.session_state.ide_sendiri = st.text_input("Ada ide tambahan lain? (Ketik di sini) 💡")
     
     st.markdown("<br>", unsafe_allow_html=True)
     if st.button("Lanjut 🚀"):
+        # Menyaring hanya kegiatan yang dipilih (berstatus True)
+        st.session_state.kegiatan = [k for k, v in st.session_state.kegiatan_dipilih.items() if v]
         st.session_state.halaman = 6
         st.rerun()
 
@@ -201,10 +226,10 @@ elif st.session_state.halaman == 7:
 # HALAMAN 8: HASIL CETAK TIKET
 # =====================================================================
 elif st.session_state.halaman == 8:
-    st.balloons() # Efek balon terbang saat tiket jadi
+    st.balloons()
     st.markdown("<h2>🎉 TIKET KENCAN KITA 🎉</h2>", unsafe_allow_html=True)
     
-    # Menggabungkan data kegiatan
+    # Menggabungkan data kegiatan yang dipilih
     list_kegiatan = ", ".join(st.session_state.kegiatan)
     if st.session_state.ide_sendiri:
         if list_kegiatan:
@@ -237,5 +262,4 @@ elif st.session_state.halaman == 8:
     st.markdown(desain_tiket, unsafe_allow_html=True)
     
     st.markdown("<br>", unsafe_allow_html=True)
-    # Tombol screenshot panduan
     st.success("Yeay! Tiketnya sudah jadi. Jangan lupa di-screenshot dan kirim ke Anesyi ya! 📸")
