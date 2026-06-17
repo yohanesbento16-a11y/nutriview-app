@@ -1,195 +1,241 @@
 import streamlit as st
-import json
-import os
-import base64
+import time
+import streamlit.components.v1 as components
 
 # =====================================================================
-# 1. KONFIGURASI HALAMAN & CSS JITU
+# KONFIGURASI HALAMAN & CSS BUCIN
 # =====================================================================
-st.set_page_config(page_title="NutriView - Sekolah", page_icon="🏫", layout="centered")
+st.set_page_config(page_title="Untuk Abey 💌", page_icon="💖", layout="centered")
 
 custom_css = """
 <style>
-    /* 🌟 MENYEMBUNYIKAN GITHUB & FORK, TAPI DIJAMIN MENU TEMA TETAP AMAN 🌟 */
-    
-    /* Hanya menyembunyikan elemen tautan/link (Fork & GitHub) yang ada di dalam header atas */
-    header a, [data-testid="stHeader"] a {
-        display: none !important;
-    }
-    
-    /* Menyembunyikan tombol Deploy bawaan Streamlit */
-    .stAppDeployButton {
-        display: none !important;
-    }
+    /* Sembunyikan elemen bawaan Streamlit agar terlihat seperti web asli */
+    header, [data-testid="stHeader"] { display: none !important; }
+    .stAppDeployButton { display: none !important; }
+    footer { display: none !important; }
 
-    /* Pengaturan Warna Judul & Tombol (Otomatis Light/Dark Mode) */
-    @media (prefers-color-scheme: light) {
-        h1, h2, h3, .stSubheader { color: #6495ED !important; }
-        div.stButton > button:first-child { background-color: #6495ED !important; color: white !important; border: none; }
-    }
-    @media (prefers-color-scheme: dark) {
-        div.stButton > button:first-child { background-color: #6495ED !important; color: white !important; border: none; }
-    }
-    div.stButton > button:first-child:hover { opacity: 0.85; }
+    /* Desain font dan warna pastel untuk tema romantis */
+    @import url('https://fonts.googleapis.com/css2?family=Comic+Neue:wght@700&family=Pacifico&display=swap');
     
-    /* Desain Kartu Menu Kantin */
-    .menu-card {
-        border: 1px solid #ddd;
-        border-radius: 10px;
-        padding: 15px;
-        margin-bottom: 20px;
+    h1, h2, h3 { 
+        font-family: 'Comic Neue', cursive !important; 
+        color: #ff4b4b !important; 
+        text-align: center;
+    }
+    p, label, .stRadio, .stCheckbox { 
+        font-family: 'Comic Neue', cursive !important; 
+        font-size: 18px !important;
+    }
+    
+    /* Tombol Streamlit berwarna Pink */
+    div.stButton > button:first-child { 
+        background-color: #ff4b4b !important; 
+        color: white !important; 
+        border-radius: 20px !important;
+        font-size: 18px !important;
+        font-weight: bold !important;
+        border: none !important;
+        width: 100%;
+    }
+    div.stButton > button:first-child:hover {
+        background-color: #ff7aa2 !important;
     }
 </style>
 """
 st.markdown(custom_css, unsafe_allow_html=True)
 
 # =====================================================================
-# 2. SISTEM DATABASE LOKAL (Penyimpanan JSON)
+# PENGATURAN STATE HALAMAN (Untuk pindah-pindah menu)
 # =====================================================================
-DB_FILE = "menu_sekolah.json"
-
-def muat_data_menu():
-    if os.path.exists(DB_FILE):
-        with open(DB_FILE, "r", encoding="utf-8") as f:
-            return json.load(f)
-    return []
-
-def simpan_data_menu(data):
-    with open(DB_FILE, "w", encoding="utf-8") as f:
-        json.dump(data, f, indent=4)
-
-data_menu = muat_data_menu()
-
+if 'halaman' not in st.session_state:
+    st.session_state.halaman = 1
 
 # =====================================================================
-# 3. TAMPILAN ANTARMUKA UTAMA
+# HALAMAN 1: LOADING & AMPLOP CINTA
 # =====================================================================
-st.title("🏫 NutriView")
-st.write("Informasi gizi makanan kita hari ini!")
-
-# Menu Tab Navigasi
-tab_siswa, tab_admin = st.tabs(["🍽️ Menu Hari Ini", "🔐 Panel Admin"])
-
-# ---------------------------------------------------------------------
-# TAB 1: HALAMAN SISWA
-# ---------------------------------------------------------------------
-with tab_siswa:
-    st.subheader("Menu Tersedia Hari Ini")
-    
-    if len(data_menu) == 0:
-        st.info("Belum ada menu yang ditambahkan untuk hari ini. Silakan tunggu Admin mengunggah menu.")
+if st.session_state.halaman == 1:
+    # Mengecek apakah loading awal sudah selesai
+    if 'loading_selesai' not in st.session_state:
+        teks_loading = st.empty()
+        bar_loading = st.progress(0)
+        
+        for persen in range(100):
+            time.sleep(0.03) # Kecepatan loading
+            bar_loading.progress(persen + 1)
+            teks_loading.markdown(f"<h3 style='color:#ffb6c1;'>Menyiapkan kejutan untuk Abey... {persen+1}%</h3>", unsafe_allow_html=True)
+            
+        st.session_state.loading_selesai = True
+        st.rerun()
     else:
-        for idx, menu in enumerate(data_menu):
-            with st.container():
-                st.markdown('<div class="menu-card">', unsafe_allow_html=True)
-                col1, col2 = st.columns([1, 2])
-                
-                with col1:
-                    if menu.get("foto_base64"):
-                        gambar_bytes = base64.b64decode(menu["foto_base64"])
-                        st.image(gambar_bytes, use_column_width=True)
-                    else:
-                        st.info("Tidak ada foto")
-                        
-                with col2:
-                    st.markdown(f"### {menu['nama']}")
-                    st.write(f"⚖️ **Porsi/Berat:** {menu['porsi']}")
-                    
-                    st.markdown("**Kandungan Gizi:**")
-                    kolom_gizi1, kolom_gizi2, kolom_gizi3, kolom_gizi4 = st.columns(4)
-                    kolom_gizi1.metric("Kalori", f"{menu['kalori']} kcal")
-                    kolom_gizi2.metric("Karbo", f"{menu['karbo']} g")
-                    kolom_gizi3.metric("Protein", f"{menu['protein']} g")
-                    kolom_gizi4.metric("Lemak", f"{menu['lemak']} g")
-                    
-                st.markdown('</div>', unsafe_allow_html=True)
+        st.markdown("<h2>Undangan Pribadi buat abey 💌</h2>", unsafe_allow_html=True)
+        st.markdown("<h1 style='font-size: 80px;'>📩</h1>", unsafe_allow_html=True)
+        
+        col1, col2, col3 = st.columns([1, 2, 1])
+        with col2:
+            if st.button("Buka Suratnya ✨"):
+                st.session_state.halaman = 2
+                st.rerun()
 
-
-# ---------------------------------------------------------------------
-# TAB 2: HALAMAN PANEL ADMIN
-# ---------------------------------------------------------------------
-with tab_admin:
-    input_password = st.text_input("Masukkan Password Admin Sekolah:", type="password")
+# =====================================================================
+# HALAMAN 2: PERTANYAAN UTAMA (Tombol Kabur)
+# =====================================================================
+elif st.session_state.halaman == 2:
+    st.markdown("<h2>maukah kamu jayan jayan cama anesyi? 🥺👉👈</h2>", unsafe_allow_html=True)
+    st.markdown("<h1 style='font-size: 60px;'>🧸✨</h1>", unsafe_allow_html=True)
     
-    # Python akan mengambil password asli dari brankas Secrets Streamlit
-    if input_password == st.secrets["PASSWORD_ADMIN"]:
-        st.success("Akses Diterima! Selamat datang, Admin.")
-        
-        # Fitur Tambah Menu
-        with st.expander("➕ Tambah Menu Baru", expanded=True):
-            with st.form("form_tambah_menu", clear_on_submit=True):
-                nama_makanan = st.text_input("Nama Jajanan / Makanan:")
-                porsi = st.text_input("Estimasi Porsi (Contoh: 1 Porsi / 200 gram):")
-                
-                col_k1, col_k2 = st.columns(2)
-                with col_k1:
-                    kalori = st.number_input("Kalori (kcal)", min_value=0.0, step=1.0)
-                    karbo = st.number_input("Karbohidrat (g)", min_value=0.0, step=1.0)
-                with col_k2:
-                    protein = st.number_input("Protein (g)", min_value=0.0, step=1.0)
-                    lemak = st.number_input("Lemak (g)", min_value=0.0, step=1.0)
-                
-                foto_upload = st.file_uploader("Unggah Foto Makanan", type=["jpg", "jpeg", "png"])
-                submit_menu = st.form_submit_button("Simpan Menu ke Database 💾")
-                
-                if submit_menu:
-                    if nama_makanan.strip() == "":
-                        st.error("Nama makanan tidak boleh kosong!")
-                    else:
-                        foto_b64 = ""
-                        if foto_upload is not None:
-                            foto_bytes = foto_upload.read()
-                            foto_b64 = base64.b64encode(foto_bytes).decode('utf-8')
-                            
-                        menu_baru = {
-                            "nama": nama_makanan,
-                            "porsi": porsi,
-                            "kalori": kalori,
-                            "karbo": karbo,
-                            "protein": protein,
-                            "lemak": lemak,
-                            "foto_base64": foto_b64
-                        }
-                        
-                        data_menu.append(menu_baru)
-                        simpan_data_menu(data_menu)
-                        st.success(f"Berhasil menambahkan {nama_makanan}!")
-                        st.rerun()
-        
-        # Fitur Hapus Menu
-        with st.expander("🗑️ Hapus Menu"):
-            if len(data_menu) > 0:
-                pilihan_hapus = st.selectbox("Pilih menu yang ingin dihapus:", [m["nama"] for m in data_menu])
-                if st.button("Hapus Menu Terpilih"):
-                    data_menu = [m for m in data_menu if m["nama"] != pilihan_hapus]
-                    simpan_data_menu(data_menu)
-                    st.success(f"Menu '{pilihan_hapus}' berhasil dihapus.")
-                    st.rerun()
-            else:
-                st.info("Belum ada data menu.")
-                
-        # Fitur Lihat Kotak Masukan Siswa
-        with st.expander("📬 Kotak Masukan Siswa"):
-            try:
-                with open("saran_kritik.txt", "r", encoding="utf-8") as f:
-                    data_saran = f.read()
-                st.text_area("Isi Kotak Saran Saat Ini:", value=data_saran, height=200)
-                st.download_button("📥 Unduh File Saran (.txt)", data=data_saran, file_name="saran_sekolah.txt")
-            except FileNotFoundError:
-                st.info("Belum ada saran atau kritik.")
+    col1, col2 = st.columns(2)
+    
+    # Tombol "Mau"
+    with col1:
+        if st.button("mauuu!! 💖"):
+            st.session_state.halaman = 3
+            st.rerun()
+            
+    # Tombol "Ga ah" yang kabur (Pakai HTML/JS)
+    with col2:
+        components.html("""
+            <div style="width: 100%; height: 200px; position: relative;">
+                <button id="btnKabur" 
+                    style="
+                        position: absolute; left: 20%; top: 20%; 
+                        padding: 10px 20px; font-size: 16px; font-weight: bold;
+                        border: none; background-color: #e0e0e0; color: #555; 
+                        border-radius: 20px; cursor: pointer;
+                        box-shadow: 2px 2px 5px rgba(0,0,0,0.2);
+                        transition: top 0.1s, left 0.1s;
+                    " 
+                    onmouseover="kabur()">ga ah 🙈</button>
+            </div>
+            <script>
+                function kabur() {
+                    var btn = document.getElementById('btnKabur');
+                    var container = btn.parentElement;
+                    // Hitung batas maksimal x dan y supaya tombol tidak keluar kotak
+                    var maxX = container.clientWidth - btn.clientWidth;
+                    var maxY = container.clientHeight - btn.clientHeight;
+                    
+                    var x = Math.floor(Math.random() * maxX);
+                    var y = Math.floor(Math.random() * maxY);
+                    
+                    btn.style.left = x + 'px';
+                    btn.style.top = y + 'px';
+                }
+            </script>
+        """, height=250)
 
 # =====================================================================
-# 4. KOTAK SARAN SISWA (TAMPIL DI BAGIAN PALING BAWAH HALAMAN)
+# HALAMAN 3: LOADING TRANSISI "YEYY MAUUU"
 # =====================================================================
-st.markdown("---")
-st.subheader("💬 Hubungi Admin (Saran & Kritik)")
-with st.form("form_saran", clear_on_submit=True):
-    nama_siswa = st.text_input("Nama:")
-    pesan_siswa = st.text_area("Tulis saran, request makanan sehat, atau kritik di sini:")
-    if st.form_submit_button("Kirim Masukan 📩"):
-        if pesan_siswa.strip():
-            with open("saran_kritik.txt", "a", encoding="utf-8") as f:
-                f.write(f"Dari: {nama_siswa}\nPesan: {pesan_siswa}\n{'-'*30}\n")
-            st.success("Terima kasih! Masukanmu sudah terkirim.")
+elif st.session_state.halaman == 3:
+    st.markdown("<h2 style='margin-top: 100px;'>yeyy abey mauuu 🥰🎉</h2>", unsafe_allow_html=True)
+    with st.spinner(""):
+        time.sleep(2.5) # Jeda waktu sebelum pindah halaman
+    st.balloons()
+    st.session_state.halaman = 4
+    st.rerun()
+
+# =====================================================================
+# HALAMAN 4: ATUR TANGGAL & WAKTU
+# =====================================================================
+elif st.session_state.halaman == 4:
+    st.markdown("<h2>kapan cayang na atu free? ⏰</h2>", unsafe_allow_html=True)
+    st.markdown("---")
+    
+    st.session_state.tanggal = st.date_input("Pilih Tanggal Kencan:")
+    st.session_state.waktu = st.time_input("Pilih Jam Kencan:")
+    
+    st.markdown("<br>", unsafe_allow_html=True)
+    if st.button("Lanjut 🚀"):
+        st.session_state.halaman = 5
+        st.rerun()
+
+# =====================================================================
+# HALAMAN 5: NANTI KITA NGAPAIN AJA?
+# =====================================================================
+elif st.session_state.halaman == 5:
+    st.markdown("<h2>nanti kita ngapain aja? 🤔</h2>", unsafe_allow_html=True)
+    st.markdown("---")
+    
+    pilihan_kegiatan = ["makan bareng 🍽️", "nonton 🎬", "jalan aja 🚶‍♂️", "main ajaa 🎡", "photoboot 📸"]
+    # Pakai multiselect supaya bisa pilih lebih dari 1
+    st.session_state.kegiatan = st.multiselect("Pilih yang seru (boleh lebih dari satu!):", pilihan_kegiatan)
+    
+    # Kotak untuk ide sendiri
+    st.session_state.ide_sendiri = st.text_input("Ada ide tambahan lain? (Ketik di sini) 💡")
+    
+    st.markdown("<br>", unsafe_allow_html=True)
+    if st.button("Lanjut 🚀"):
+        st.session_state.halaman = 6
+        st.rerun()
+
+# =====================================================================
+# HALAMAN 6: DRESS CODE
+# =====================================================================
+elif st.session_state.halaman == 6:
+    st.markdown("<h2>dress codenya? 👗👔</h2>", unsafe_allow_html=True)
+    st.markdown("---")
+    
+    pilihan_baju = ["santai 👕", "cute/imut 🎀", "satu warna 🎨", "rapih/formal 👔", "couple 👫"]
+    st.session_state.dresscode = st.radio("Pilih gaya baju kita nanti:", pilihan_baju)
+    
+    st.markdown("<br>", unsafe_allow_html=True)
+    if st.button("Lanjut 🚀"):
+        st.session_state.halaman = 7
+        st.rerun()
+
+# =====================================================================
+# HALAMAN 7: PESAN UNTUK ANESYI
+# =====================================================================
+elif st.session_state.halaman == 7:
+    st.markdown("<h2>pesan untuk anesyi 💌</h2>", unsafe_allow_html=True)
+    st.markdown("---")
+    
+    st.session_state.pesan_abey = st.text_area("Tulis kata-kata manis atau request khusus buat anesyi:")
+    
+    st.markdown("<br>", unsafe_allow_html=True)
+    if st.button("Bikin Tiketnya 🎟️"):
+        st.session_state.halaman = 8
+        st.rerun()
+
+# =====================================================================
+# HALAMAN 8: HASIL CETAK TIKET
+# =====================================================================
+elif st.session_state.halaman == 8:
+    st.balloons() # Efek balon terbang saat tiket jadi
+    st.markdown("<h2>🎉 TIKET KENCAN KITA 🎉</h2>", unsafe_allow_html=True)
+    
+    # Menggabungkan data kegiatan
+    list_kegiatan = ", ".join(st.session_state.kegiatan)
+    if st.session_state.ide_sendiri:
+        if list_kegiatan:
+            list_kegiatan += f", {st.session_state.ide_sendiri}"
         else:
-            st.error("Pesan tidak boleh kosong.")
+            list_kegiatan = st.session_state.ide_sendiri
+            
+    # Format tanggal & waktu
+    tgl_format = st.session_state.tanggal.strftime("%d %B %Y")
+    waktu_format = st.session_state.waktu.strftime("%H:%M")
+    
+    # Desain Tiket dengan HTML
+    desain_tiket = f"""
+    <div style="border: 4px dashed #ff4b4b; border-radius: 20px; padding: 25px; background-color: #fff0f5; color: #333; margin-top: 20px; box-shadow: 5px 5px 15px rgba(0,0,0,0.1);">
+        <h2 style="text-align: center; color: #ff4b4b; margin-top: 0; font-size: 28px;">💕 OFFICIAL DATE PASS 💕</h2>
+        <div style="font-size: 18px; font-family: 'Comic Neue', cursive;">
+            <p><strong>Kepada:</strong> Abey tersayang 🧸</p>
+            <p><strong>Dari:</strong> Anesyi 🎀</p>
+            <hr style="border-top: 2px dashed #ffb6c1; margin: 15px 0;">
+            <p><strong>📅 Hari/Tanggal:</strong> {tgl_format}</p>
+            <p><strong>⏰ Waktu:</strong> {waktu_format} WIB</p>
+            <p><strong>🎡 Agenda Kita:</strong> {list_kegiatan if list_kegiatan else 'Jalan-jalan random aja!'}</p>
+            <p><strong>👗 Dress Code:</strong> {st.session_state.dresscode}</p>
+            <hr style="border-top: 2px dashed #ffb6c1; margin: 15px 0;">
+            <p><strong>💌 Pesan dari Abey:</strong> <br> <i>"{st.session_state.pesan_abey if st.session_state.pesan_abey else 'Gak sabar ketemu!'}"</i></p>
+        </div>
+        <h3 style="text-align: center; color: #ff4b4b; margin-top: 30px;">Sampai ketemu, cayangg! ❤️</h3>
+    </div>
+    """
+    st.markdown(desain_tiket, unsafe_allow_html=True)
+    
+    st.markdown("<br>", unsafe_allow_html=True)
+    # Tombol screenshot panduan
+    st.success("Yeay! Tiketnya sudah jadi. Jangan lupa di-screenshot dan kirim ke Anesyi ya! 📸")
